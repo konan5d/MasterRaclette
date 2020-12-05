@@ -66,16 +66,18 @@ private:
 
         /* IA vs Player */
     QLineEdit *_line_nb_gen;
+    QLineEdit *_line_nb_gen2;
 
     //Button Group : Quit & Change Game mode
     QHBoxLayout *_hbox_ui_button;
+    QPushButton *_ui_play;
     QPushButton *_ui_change_mode;
     QPushButton *_ui_quit;
 
 public:
     MainWindow(QWidget *parent = nullptr);
 
-    // Parameters for the game
+    //Parameters of game
     QGroupBox *createGameParamGroup(void);
 
     //Combination
@@ -93,9 +95,18 @@ public:
     ~MainWindow();
 
 public slots:
+    //Parameters of game
+    void enableGameParamGroup(bool mode);
+
+    //Combination
     void enableCombinationGroup(bool mode);
     void inputCombination(void);
+    //Game info
     void changeInformationDisplayed(int mode);
+
+    //UI Button
+    void enablePlayButton(int mode);
+    void enableChangeModeButton(int mode);
 
 private:
     Ui::MainWindow *ui;

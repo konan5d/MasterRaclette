@@ -12,11 +12,14 @@ private:
     QList <Ingredient *> _ingredients;
 
     //Mode 0 : Player vs IA
+    Combination _secret_combination;
     Combination _player_combination;
 
 public:
     MasterRaclette();
     QList<Ingredient *> ingredients() const;
+
+    void initGame(int mode);
 
 public slots:
     void setGameMode(int mode);

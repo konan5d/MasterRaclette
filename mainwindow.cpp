@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Set Grid Window
     _grid_window->addWidget(_grbox_game_param, 0, 0, 1, 2);
     _grid_window->addWidget(_textedit_display, 1, 0);
-    _grid_window->addWidget(_grbox_combination, 1, 1);
+    _grid_window->addWidget(_grbox_combination, 1, 1, 2, 1);
     _grid_window->addWidget(_grbox_game_info, 2, 0);
     _grid_window->addLayout(_hbox_ui_button, 3, 0, 1, 2);
 
@@ -57,8 +57,8 @@ QGroupBox *MainWindow::createGameParamGroup()
     radio_4_ingredient->setChecked(true);
 
     //Play Button
-    QPushButton *button_play = new QPushButton("Play !");
-    button_play->setFixedHeight(50);
+    QPushButton *button_intput_param = new QPushButton("Input Parameters / Reset");
+    button_intput_param->setFixedHeight(50);
 
     //Row : 0 (Game mode)
     grid->addWidget(label_game_mode, 0, 0);
@@ -71,7 +71,7 @@ QGroupBox *MainWindow::createGameParamGroup()
     grid->addWidget(radio_8_ingredient, 1, 3);
 
     //Play Button
-    grid->addWidget(button_play, 0, 4, 2, 1);
+    grid->addWidget(button_intput_param, 0, 4, 2, 1);
 
     group_box->setMaximumHeight(100);
     group_box->setLayout(grid);
@@ -83,7 +83,7 @@ QGroupBox *MainWindow::createGameParamGroup()
     connect(radio_4_ingredient, &QRadioButton::toggled, [=](){_masterraclette->setNumberIngredient(4);});
     connect(radio_6_ingredient, &QRadioButton::toggled, [=](){_masterraclette->setNumberIngredient(6);});
     connect(radio_8_ingredient, &QRadioButton::toggled, [=](){_masterraclette->setNumberIngredient(8);});
-    connect(button_play, &QPushButton::clicked, [this](){enableCombinationGroup(false);});
+    connect(button_intput_param, &QPushButton::clicked, [this](){enableCombinationGroup(false);});
 
     return group_box;
 }
@@ -243,8 +243,15 @@ QGroupBox *MainWindow::IaVsPlayerInfo(QGroupBox *group_box)
     _line_nb_gen = new QLineEdit();
     _line_nb_gen->setReadOnly(true);
 
+    QLabel *label_nb_gen2 = new QLabel("Generation Number 2:");
+    _line_nb_gen2 = new QLineEdit();
+    _line_nb_gen2->setReadOnly(true);
+
     grid->addWidget(label_nb_gen, 0, 0);
     grid->addWidget(_line_nb_gen, 0, 1);
+
+    grid->addWidget(label_nb_gen2, 1, 0);
+    grid->addWidget(_line_nb_gen2, 1, 1);
 
     group_box->setLayout(grid);
 
@@ -255,18 +262,27 @@ QHBoxLayout *MainWindow::createUIButtonGroup()
 {
     QHBoxLayout *hbox_layout = new QHBoxLayout();
 
+    _ui_play = new QPushButton("Play !");
     _ui_change_mode = new QPushButton("Change Game Mode");
     _ui_quit = new QPushButton("Quit Game");
 
+    _ui_play->setFixedHeight(50);
     _ui_change_mode->setFixedHeight(50);
     _ui_quit->setFixedHeight(50);
 
+    hbox_layout->addWidget(_ui_play);
     hbox_layout->addWidget(_ui_change_mode);
     hbox_layout->addWidget(_ui_quit);
 
+    _ui_play->setDisabled(true);
     _ui_change_mode->setDisabled(true);
 
     //Signal
+    connect(_ui_play, &QPushButton::clicked, [this](){enableGameParamGroup(false);});
+    connect(_ui_play, &QPushButton::clicked, [this](){enableChangeModeButton(true);});
+    connect(_ui_play, &QPushButton::clicked, [this](){enablePlayButton(false);});
+
+    connect(_ui_change_mode, &QPushButton::clicked, [this](){enableGameParamGroup(true);});
     connect(_ui_quit, &QPushButton::clicked, this, &QWidget::close);
 
 
@@ -277,8 +293,13 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 /* ############################ SLOTS #######################################*/
+
+void MainWindow::enableGameParamGroup(bool mode)
+{
+    _grbox_game_param->setDisabled(!mode);
+}
+
 void MainWindow::enableCombinationGroup(bool mode)
 {
     _grbox_combination->setDisabled(mode);
@@ -311,6 +332,7 @@ void MainWindow::inputCombination()
 {
     QList <int> list_ind_ingredient;
 
+    //Save index of ingredient (input user)
     for(int index_combo = 0 ; index_combo < Parameters::nb_ingredient; index_combo++)
     {
 
@@ -320,10 +342,11 @@ void MainWindow::inputCombination()
         //On vérifie que le joueur a choisi un ingrédient
         if(ind_ingredient != -1)
         {
-            //On enregistre less index dans la liste
+            //On enregistre les index dans la liste
             list_ind_ingredient.append(ind_ingredient);
         }
     }
+
 
     if(list_ind_ingredient.size() == Parameters::nb_ingredient)
     {
@@ -331,16 +354,61 @@ void MainWindow::inputCombination()
         _masterraclette->setPlayerCombination(list_ind_ingredient);
 
         _textedit_display->insertPlainText("So Great !\n");
+
+        enablePlayButton(true);
     }
     else
     {
         _textedit_display->insertPlainText("Oh noooo! ! You don't have enough ingredients to eat a raclette. Your friends are gone :(\n");
         _textedit_display->insertPlainText("Please choose many ingredients !\n");
+
+        enablePlayButton(false);
     }
 }
 
 void MainWindow::changeInformationDisplayed(int mode)
 {
+    //Clear Layout
+    if(_grbox_game_info->layout())
+    {
+        while(_grbox_game_info->layout()->count() > 0)
+        {
+            QLayoutItem *item = _grbox_game_info->layout()->takeAt(0);
+            QWidget *widget = item->widget();
 
+            if(widget)
+            {
+                delete widget;
+            }
+
+            delete item;
+        }
+    }
+
+    delete _grbox_game_info->layout();
+
+    //Set a new layout
+    if(mode == 0)
+    {
+        //Player Vs IA
+        _grbox_game_info = playerVsIaInfo(_grbox_game_info);
+    }
+
+    else if(mode == 1)
+    {
+        //IA vs Player (Génétique)
+        _grbox_game_info = IaVsPlayerInfo(_grbox_game_info);
+    }
+
+    _widget_ui->update();
 }
 
+void MainWindow::enablePlayButton(int mode)
+{
+    _ui_play->setDisabled(!mode);
+}
+
+void MainWindow::enableChangeModeButton(int mode)
+{
+    _ui_change_mode->setDisabled(!mode);
+}

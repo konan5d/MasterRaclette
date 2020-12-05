@@ -19,10 +19,22 @@ QList<Ingredient *> MasterRaclette::ingredients() const
     return _ingredients;
 }
 
+void MasterRaclette::initGame(int mode)
+{
+    if(mode == 0)
+    {
+        //Player vs IA
+    }
+    else if(mode == 1)
+    {
+        //IA vs Player
+    }
+}
+
 /* ############################ SLOTS #######################################*/
 void MasterRaclette::setGameMode(int mode)
 {
-    Parameters::game_mode = mode;
+    Parameters::game_mode = mode;  
 }
 
 void MasterRaclette::setNumberIngredient(int nb_ingredient)
