@@ -7,6 +7,7 @@ int Parameters::game_mode = 0;
 int Parameters::nb_try = 10;
 int Parameters::nb_ingredient = 4; //max 8
 int Parameters::nb_ingredient_available = 0;
+bool Parameters::game_in_progress = false;
 
 //Genetique :
 int Parameters::nb_individu = 10;
@@ -18,7 +19,6 @@ Parameters::Parameters()
 {
 
 }
-
 
 /*void Parameters::print(QString txt, int d)
 {

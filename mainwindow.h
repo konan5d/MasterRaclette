@@ -63,6 +63,7 @@ private:
     QGroupBox *_grbox_game_info;
         /* Player Vs IA */
     QLineEdit *_line_nb_try;
+    QLineEdit *_line_nb_try_player;
 
         /* IA vs Player */
     QLineEdit *_line_nb_gen;
@@ -107,6 +108,11 @@ public slots:
     //UI Button
     void enablePlayButton(int mode);
     void enableChangeModeButton(int mode);
+
+    // IN GAME 
+        //Mode : Player Vs IA
+    void displayResult(int nb_good_ing, int nb_bad_ing);
+    void refreshGameInfo(int mode, int value);
 
 private:
     Ui::MainWindow *ui;

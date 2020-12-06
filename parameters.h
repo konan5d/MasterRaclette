@@ -1,9 +1,10 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#include <QObject>
 #include <QString>
 #include "random.h"
-class Parameters
+class Parameters : public QObject
 {
 public:
     Parameters();
@@ -13,6 +14,7 @@ public:
     static int nb_try;
     static int nb_ingredient;
     static int nb_ingredient_available;
+    static bool game_in_progress;
 
     //Paramètres Génétique
     static int nb_individu;
@@ -22,7 +24,6 @@ public:
     //static void print(QString txt, int d);
 
     static Random *random_nbr;
-
 };
 
 #endif // PARAMETERS_H

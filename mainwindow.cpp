@@ -32,6 +32,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     _widget_ui->setLayout(_grid_window);
 
+    //Connect
+    connect(_masterraclette, &MasterRaclette::inputUser, [this](int nb_good, int nb_bad){displayResult(nb_good, nb_bad);});
+    //connect(_masterraclette, &MasterRaclette::gameFinished, [this](bool state){displayResult(state);});
+
     setCentralWidget(_widget_ui);
 }
 
@@ -83,7 +87,11 @@ QGroupBox *MainWindow::createGameParamGroup()
     connect(radio_4_ingredient, &QRadioButton::toggled, [=](){_masterraclette->setNumberIngredient(4);});
     connect(radio_6_ingredient, &QRadioButton::toggled, [=](){_masterraclette->setNumberIngredient(6);});
     connect(radio_8_ingredient, &QRadioButton::toggled, [=](){_masterraclette->setNumberIngredient(8);});
-    connect(button_intput_param, &QPushButton::clicked, [this](){enableCombinationGroup(false);});
+
+    //connect(button_intput_param, &QPushButton::clicked, [this](){enableCombinationGroup(false);});
+    connect(button_intput_param, &QPushButton::clicked, [this](){enablePlayButton(true);});
+
+
 
     return group_box;
 }
@@ -222,15 +230,25 @@ QGroupBox *MainWindow::playerVsIaInfo(QGroupBox *group_box)
 {
     QGridLayout *grid = new QGridLayout();
 
-    QLabel *label_nb_try = new QLabel("Number Try :");
+    QLabel *label_nb_try = new QLabel("Number of trials :");
     _line_nb_try = new QLineEdit();
     _line_nb_try->setReadOnly(true);
-    _line_nb_try->setText("It's a try");
+    _line_nb_try->setText(QString::number(Parameters::nb_try, 10));
+
+    QLabel *label_nb_try_player = new QLabel("Number of trials remaining:");
+    _line_nb_try_player = new QLineEdit();
+    _line_nb_try_player->setReadOnly(true);
+    _line_nb_try_player->setText(QString::number(Parameters::nb_try, 10));
 
     grid->addWidget(label_nb_try, 0, 0);
     grid->addWidget(_line_nb_try, 0, 1);
+    grid->addWidget(label_nb_try_player, 1, 0);
+    grid->addWidget(_line_nb_try_player, 1, 1);
 
     group_box->setLayout(grid);
+
+    //Connect
+    connect(_masterraclette, &MasterRaclette::setNbTry, [this](int value){refreshGameInfo(0, value);});
 
     return group_box;
 }
@@ -254,6 +272,7 @@ QGroupBox *MainWindow::IaVsPlayerInfo(QGroupBox *group_box)
     grid->addWidget(_line_nb_gen2, 1, 1);
 
     group_box->setLayout(grid);
+
 
     return group_box;
 }
@@ -281,8 +300,12 @@ QHBoxLayout *MainWindow::createUIButtonGroup()
     connect(_ui_play, &QPushButton::clicked, [this](){enableGameParamGroup(false);});
     connect(_ui_play, &QPushButton::clicked, [this](){enableChangeModeButton(true);});
     connect(_ui_play, &QPushButton::clicked, [this](){enablePlayButton(false);});
+    connect(_ui_play, &QPushButton::clicked, [this](){enableCombinationGroup(true);});
+    connect(_ui_play, &QPushButton::clicked, [this](){_masterraclette->resetGame();});
 
     connect(_ui_change_mode, &QPushButton::clicked, [this](){enableGameParamGroup(true);});
+    connect(_ui_change_mode, &QPushButton::clicked, [this](){enableCombinationGroup(false);});
+
     connect(_ui_quit, &QPushButton::clicked, this, &QWidget::close);
 
 
@@ -302,7 +325,7 @@ void MainWindow::enableGameParamGroup(bool mode)
 
 void MainWindow::enableCombinationGroup(bool mode)
 {
-    _grbox_combination->setDisabled(mode);
+    _grbox_combination->setDisabled(!mode);
 
     if(Parameters::nb_ingredient >= 6)
     {
@@ -324,8 +347,7 @@ void MainWindow::enableCombinationGroup(bool mode)
     }
 
     _textedit_display->clear();
-    _textedit_display->insertPlainText("Please input your combinaison ! \n");
-
+    _textedit_display->insertPlainText("Please input your combinaison, and press \"Input Combination \".\n");
 }
 
 void MainWindow::inputCombination()
@@ -353,16 +375,14 @@ void MainWindow::inputCombination()
         //Si le joueur a rentré suffisement d'ingrédients pour jouer
         _masterraclette->setPlayerCombination(list_ind_ingredient);
 
-        _textedit_display->insertPlainText("So Great !\n");
+        _masterraclette->launchGame();
 
-        enablePlayButton(true);
     }
     else
     {
         _textedit_display->insertPlainText("Oh noooo! ! You don't have enough ingredients to eat a raclette. Your friends are gone :(\n");
         _textedit_display->insertPlainText("Please choose many ingredients !\n");
 
-        enablePlayButton(false);
     }
 }
 
@@ -411,4 +431,31 @@ void MainWindow::enablePlayButton(int mode)
 void MainWindow::enableChangeModeButton(int mode)
 {
     _ui_change_mode->setDisabled(!mode);
+}
+
+//Mode : Player Vs IA
+void MainWindow::displayResult(int nb_good_ing, int nb_bad_ing)
+{
+    _textedit_display->insertPlainText("Trials Number : " + QString::number(_masterraclette->nb_try(), 10)+"\n");
+
+    _textedit_display->insertPlainText("Number of good ingredient : ");
+    _textedit_display->insertPlainText(QString::number(nb_good_ing, 10)+"\n");
+
+    _textedit_display->insertPlainText("Number of bad ingredient : ");
+    _textedit_display->insertPlainText(QString::number(nb_bad_ing, 10)+"\n");
+
+    _textedit_display->insertPlainText("Combination = " + _masterraclette->player_combination()->toString() + "\n");
+
+}
+
+void MainWindow::refreshGameInfo(int mode, int value)
+{
+    if(mode == 0)
+    {
+        _line_nb_try_player->setText(QString::number(value, 10));
+    }
+    else if (mode == 1)
+    {
+        //Nothing to do
+    }
 }
