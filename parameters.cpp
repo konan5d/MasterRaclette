@@ -12,8 +12,9 @@ bool Parameters::game_in_progress = false;
 //Genetique :
 int Parameters::nb_individu = 10;
 int Parameters::best_fitness;
+int Parameters::max_generation = 50;
 
-Random *Parameters::random_nbr= new Random(0);
+Random *Parameters::random_nbr= new Random(-1);
 
 Parameters::Parameters()
 {

@@ -19,6 +19,7 @@ public:
     //Paramètres Génétique
     static int nb_individu;
     static int best_fitness;
+    static int max_generation;
 
     static int debug;
     //static void print(QString txt, int d);

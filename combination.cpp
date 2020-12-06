@@ -10,6 +10,23 @@ int Combination::nb_bad_ingredient() const
     return _nb_bad_ingredient;
 }
 
+QList<Ingredient *> Combination::ingredient() const
+{
+    return _ingredient;
+}
+
+void Combination::setFitness(int fitness)
+{
+    _fitness = fitness;
+}
+
+int Combination::fitness() const
+{
+    return _fitness;
+}
+
+
+
 Combination::Combination()
 {
 
@@ -141,4 +158,31 @@ QString Combination::toString(void)
     }
 
     return buf + "]";
+}
+
+double Combination::evaluate(Combination *best_individu)
+{
+    double fitness = 0;
+
+    this->compareCombination(best_individu);
+
+    for(int index_ing = 0; index_ing < Parameters::nb_ingredient; index_ing++)
+    {
+        if(_count_good_ingredient[index_ing] > 0)
+        {
+            fitness += _ingredient.at(index_ing)->getValue()*2;
+        }
+
+        if(_count_bad_ingredient[index_ing] > 0)
+        {
+            fitness += _ingredient.at(index_ing)->getValue()*1;
+        }
+    }
+
+    return fitness;
+}
+
+bool Combination::lessFitnessThan(const Combination *comb1, const Combination *comb2)
+{
+    return comb1->fitness() > comb2->fitness();
 }

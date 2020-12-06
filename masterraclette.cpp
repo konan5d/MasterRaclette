@@ -43,10 +43,11 @@ void MasterRaclette::launchGame()
     else if(Parameters::game_mode == 1)
     {
         //IA vs Player
+        playModeIaVsPlayer();
     }
 }
 
-void MasterRaclette::playModePlayerVsIa()
+void MasterRaclette::playModePlayerVsIa() //Mode 0
 {
     if(Parameters::game_in_progress == false)
     {
@@ -79,6 +80,22 @@ void MasterRaclette::playModePlayerVsIa()
         {
             Parameters::game_in_progress = false;
         }
+    }
+}
+
+void MasterRaclette::playModeIaVsPlayer() //Mode  : Génétique
+{
+    if(Parameters::game_in_progress == false)
+    {
+        //Instanciation d'Evolutionnary Process
+        _evo = new EvolutionnaryProcess(_ingredients, _player_combination);
+
+        Parameters::game_in_progress = true;
+    }
+
+    if(Parameters::game_in_progress == true)
+    {
+        _evo->run();
     }
 }
 

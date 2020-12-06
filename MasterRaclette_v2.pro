@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     combination.cpp \
+    evolutionnaryprocess.cpp \
     ingredient.cpp \
     ingredientbox.cpp \
     main.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     combination.h \
+    evolutionnaryprocess.h \
     ingredient.h \
     ingredientbox.h \
     mainwindow.h \

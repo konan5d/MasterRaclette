@@ -14,14 +14,17 @@ class Combination
 private:
     QList <Ingredient *> _ingredient; //List of genome
 
-    //Compare with secret combination
+    //Comparaison avec la combinaison secrete / individu zero
     int _count_ingredient[8] = {0,0,0,0,0,0,0,0};
     int _count_good_ingredient[8] = {0,0,0,0,0,0,0,0};
     int _count_bad_ingredient[8] = {0,0,0,0,0,0,0,0};
 
-    //Counter : good & bad ingredient
+    //Compteur : Nombre d'ingrédients valide ou non
     int _nb_good_ingredient = 0;
     int _nb_bad_ingredient = 0;
+
+    //Génétique
+    int _fitness = 0;
 
 public:
     Combination();
@@ -30,7 +33,6 @@ public:
     void setPlayerIngredient(Ingredient *ingredient, int pos_ingredient);
 
     void countIngredient(QList<Ingredient *> list_ingredient);
-
     void compareCombination(Combination *secret);
     void compareGoodPlaceinCombi(Combination *secret);
     void compareBadPlaceinCombi(Combination *secret);
@@ -40,7 +42,14 @@ public:
 
     QString toString(void);
 
+    // Génétique
+    double evaluate(Combination *best_individu);
 
+    QList<Ingredient *> ingredient() const;
+    void setFitness(int fitness);
+    int fitness() const;
+
+    static bool lessFitnessThan(const Combination *comb1, const Combination *comb2);
 };
 
 #endif // COMBINATION_H

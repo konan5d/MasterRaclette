@@ -5,6 +5,7 @@
 #include "ingredient.h"
 #include "parameters.h"
 #include "combination.h"
+#include "evolutionnaryprocess.h"
 
 class MasterRaclette : public QWidget
 {
@@ -12,10 +13,13 @@ class MasterRaclette : public QWidget
 private:
     QList <Ingredient *> _ingredients;
 
-    //Mode 0 : Player vs IA
-    Combination *_secret_combination = new Combination();
     Combination *_player_combination;
 
+    //Mode 0 : Player vs IA
+    Combination *_secret_combination = new Combination();
+
+    //Mode  : IA vs Player
+    EvolutionnaryProcess *_evo;
 
     //Game
     bool _game_finish = true;
@@ -27,8 +31,8 @@ public:
 
     void launchGame();
     void playModePlayerVsIa();
+    void playModeIaVsPlayer();
 
-    //virtual ~MasterRaclette();
     Combination *player_combination() const;
 
     int nb_try() const;
