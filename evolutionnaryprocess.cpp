@@ -1,3 +1,6 @@
+//TODO : Mutation
+//TODO : Revoir le calcul du fitness
+
 #include "evolutionnaryprocess.h"
 
 EvolutionnaryProcess::EvolutionnaryProcess(QObject *parent) : QObject(parent)
@@ -55,9 +58,12 @@ void EvolutionnaryProcess::initFirstPopulation()
 void EvolutionnaryProcess::run()
 {
     //Initialisation
+    QList <Combination *> new_population;
+    QList <Combination *> last_population;
     Combination *bestIndividu;
 
     double bestFitness = 0;
+    double fitness = 0;
 
     //On tri la population intiale
     std::sort(_population.begin(), _population.end(), Combination::lessFitnessThan);
@@ -65,23 +71,140 @@ void EvolutionnaryProcess::run()
     //On récupère l'individu avec le  meilleur fitness
     bestIndividu = _population.first();
 
+    //Vérification si on trouve l'individu dans la 1ère pop
+    bestFitness = bestIndividu->fitness();
+
+    last_population = _population;
+
     //On cherche le meilleur individu dans les différentes générations
     //Tant qu'on a pas atteint le nombre de génération
     //Ou tant qu'on a pas atteint le fitness de l'individu zéro (entré par l'utilisateur)
     while(nb_generation < Parameters::max_generation && bestFitness < _individu_zero->fitness())
     {
 
-        //Vérification si on trouve l'individu dans la 1ère pop
+        if(Parameters::elitisme == true)
+        {
+            new_population.append(bestIndividu);
+        }
 
-        //Selection + Elitisme ?
-            //Mode de sélection : tournoi
+        //Selection : tournoi
+        new_population = selection(&last_population);
+        //new_population = new_population + this->selection(last_population);
 
         //Croisement
+        new_population = new_population + this->crossover(&last_population, 0.5);
 
         //Mutation
 
+
+        for(int nb_indiv=0; nb_indiv < 20; nb_indiv++)
+        {
+            new_population.append(new Combination(_list_ingredient));
+        }
+
+
+        foreach(Combination *indiv, new_population)
+        {
+            indiv->resetValues();
+
+            fitness = indiv->evaluate(_individu_zero);
+
+            indiv->setFitness(fitness);
+        }
+
+        //On tri la nouvelle génération
+        std::sort(new_population.begin(), new_population.end(), Combination::lessFitnessThan);
+
+        //On récupère l'individu avec le  meilleur fitness
+        bestIndividu = new_population.first();
+
+        bestFitness = bestIndividu->fitness();
+
+        last_population = new_population;
         // --> Nouvelle génération
 
         nb_generation += 1;
     }
 }
+
+QList<Combination *> EvolutionnaryProcess::selection(QList <Combination *> *population)
+{
+    QList <Combination *> selected_individu;
+    Combination *bestIndividu;
+    Combination *individu1;
+    Combination *individu2;
+
+    for(int nb_turn = 0; nb_turn < Parameters::tournament_size; nb_turn++)
+    {
+        individu1 = population->takeAt(Parameters::random_nbr->get(population->size()));
+        individu2 = population->takeAt(Parameters::random_nbr->get(population->size()));
+
+        bestIndividu = tournament(individu1, individu2);
+
+        selected_individu.append(bestIndividu);
+    }
+
+    return selected_individu;
+}
+
+Combination *EvolutionnaryProcess::tournament(Combination *indiv1, Combination *indiv2)
+{
+    if(indiv1->fitness() > indiv2->fitness())
+    {
+        return indiv1;
+    }
+    else if(indiv1->fitness() < indiv2->fitness())
+    {
+        return indiv2;
+    }
+    else
+    {
+        return indiv1;
+    }
+}
+
+QList<Combination *> EvolutionnaryProcess::crossover(QList <Combination *> *population, float crossover_rate)
+{
+
+    //TODO : setter pour le genome
+
+    int nb_indiv = 5;
+
+    QList <Combination *> temp_pop;
+
+    for(int index = 0; index < nb_indiv; index++)
+    {
+
+        Combination *indiv_1 = population->takeAt(Parameters::random_nbr->get(population->size()));
+        Combination *indiv_2 = population->takeAt(Parameters::random_nbr->get(population->size()));
+
+        int cross_rate_1 = int(Parameters::nb_ingredient * crossover_rate);
+        int cross_rate_2 = Parameters::nb_ingredient - cross_rate_1;
+
+        Ingredient *temp_ing;
+
+        for(int index_genome = 0; index_genome < cross_rate_1; index_genome++)
+        {
+            temp_ing = indiv_1->ingredient().at(index_genome);
+
+            indiv_2->setGenome(temp_ing, index_genome);
+        }
+
+        for(int index_genome = cross_rate_1; index_genome < cross_rate_2; index_genome++)
+        {
+            temp_ing = indiv_2->ingredient().at(index_genome);
+
+            indiv_1->setGenome(temp_ing, index_genome);
+        }
+
+        indiv_1->resetValues();
+        indiv_2->resetValues();
+
+        temp_pop.append(indiv_1);
+        temp_pop.append(indiv_2);
+    }
+
+    return temp_pop;
+
+}
+

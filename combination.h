@@ -12,6 +12,7 @@
 class Combination
 {
 private:
+
     QList <Ingredient *> _ingredient; //List of genome
 
     //Comparaison avec la combinaison secrete / individu zero
@@ -24,11 +25,12 @@ private:
     int _nb_bad_ingredient = 0;
 
     //Génétique
-    int _fitness = 0;
+    double _fitness = 0;
 
 public:
     Combination();
     Combination(QList <Ingredient *> list_ingredient);
+
 
     void setPlayerIngredient(Ingredient *ingredient, int pos_ingredient);
 
@@ -36,6 +38,8 @@ public:
     void compareCombination(Combination *secret);
     void compareGoodPlaceinCombi(Combination *secret);
     void compareBadPlaceinCombi(Combination *secret);
+
+//    void compareIngredientPlace(Combination *secret);
 
     int nb_good_ingredient() const;
     int nb_bad_ingredient() const;
@@ -46,10 +50,17 @@ public:
     double evaluate(Combination *best_individu);
 
     QList<Ingredient *> ingredient() const;
-    void setFitness(int fitness);
-    int fitness() const;
+    void setFitness(double fitness);
+    double fitness() const;
+
+    void setGenome(Ingredient *gen, int pos);
 
     static bool lessFitnessThan(const Combination *comb1, const Combination *comb2);
+
+    void clearTab(int *tab);
+    void clearAllTabs(void);
+    void resetValues(void);
+
 };
 
 #endif // COMBINATION_H

@@ -15,14 +15,19 @@ QList<Ingredient *> Combination::ingredient() const
     return _ingredient;
 }
 
-void Combination::setFitness(int fitness)
+void Combination::setFitness(double fitness)
 {
     _fitness = fitness;
 }
 
-int Combination::fitness() const
+double Combination::fitness() const
 {
     return _fitness;
+}
+
+void Combination::setGenome(Ingredient *gen, int pos)
+{
+    _ingredient.replace(pos, gen);
 }
 
 
@@ -66,7 +71,6 @@ void Combination::countIngredient(QList <Ingredient *> list_ingredient)
                 index_ingredient += 1;
             }
         }
-
         if(index_ingredient == Parameters::nb_ingredient - 1)
         {
             break;
@@ -77,74 +81,78 @@ void Combination::countIngredient(QList <Ingredient *> list_ingredient)
 void Combination::compareCombination(Combination *secret)
 {
     compareGoodPlaceinCombi(secret);
-    compareBadPlaceinCombi(secret);
 }
 
 void Combination::compareGoodPlaceinCombi(Combination *secret)
 {
-    int index_player = 0;
-    int index_secrete = 0;
+    Combination temp_secret = *secret;
 
-    foreach (Ingredient *ing_player, this->_ingredient)
+    int index_ing_player = 0;
+    int index_ing_secret = 0;
+    int pos_ing = 0;
+
+    foreach(Ingredient *ing_player, _ingredient)
     {
-        //Position de l'ingrédient dans la liste
-        int ing_pos = ing_player->getValue() - 1;
+        //On récupère la position de l'ingrédient dans la liste des ingrédients pour l'enregistrer dans le tableau
+        pos_ing = ing_player->getValue() - 1;
 
-        foreach (Ingredient *ing_secret, secret->_ingredient)
+        //On cherche l'ingrédient dans toute la liste
+        index_ing_secret = temp_secret._ingredient.indexOf(ing_player);
+
+        //Si on trouve l'ingrédient (positions identiques dans les 2 listes)
+        if(index_ing_secret == index_ing_player)
         {
-            if((ing_player == ing_secret) && (index_player == index_secrete))
-            {
-                this->_count_good_ingredient[ing_pos] += 1;
+            //On le supprime de la liste secret
+            temp_secret._ingredient.replace(index_ing_player, nullptr);
 
-                secret->_count_ingredient[ing_pos] -= 1;
+            _count_good_ingredient[pos_ing] += 1;
 
-                _nb_good_ingredient += 1;
-
-                index_secrete = 0;
-
-                break;
-            }
-
-            index_secrete += 1;
+            _nb_good_ingredient += 1;
         }
 
-        index_secrete = 0;
-        index_player += 1;
+        index_ing_player += 1;
     }
+
+    compareBadPlaceinCombi(&temp_secret);
 }
 
-void Combination::compareBadPlaceinCombi(Combination *secret)
+void Combination::compareBadPlaceinCombi(Combination *temp_secret)
 {
-    int index_player = 0;
-    int index_secrete = 0;
+    int index_ing_player = 0;
+    int index_ing_secret = 0;
+    int pos_ing = 0;
 
-    foreach (Ingredient *ing_player, this->_ingredient)
+    //On parcours la liste des ingrédients de la combinaison joueur / individu
+    foreach(Ingredient *ing_player, _ingredient)
     {
-        //Position de l'ingrédient dans la liste
-        int ing_pos = ing_player->getValue() - 1;
+        //On récupère la position de l'ingrédient dans la liste des ingrédients pour l'enregistrer dans le tableau
+        pos_ing = ing_player->getValue() - 1;
 
-        foreach (Ingredient *ing_secret, secret->_ingredient)
+        //Tant que l'ingrédient est présent dans la liste
+        while(temp_secret->_ingredient.contains(ing_player))
         {
-            if((ing_player == ing_secret) && (index_player != index_secrete)) //Même ingrédient, index différent
+            index_ing_secret = temp_secret->_ingredient.indexOf(ing_player);
+
+            if(index_ing_secret != index_ing_player)
             {
-                if(secret->_count_ingredient[ing_pos] > 0) //On vérifie qu'il n'a pas été déjà trouvé (_nb_good_ingredient)
-                {
-                    this->_count_bad_ingredient[ing_pos] += 1;
+                //A une position différente
+                temp_secret->_ingredient.replace(index_ing_secret, nullptr);
 
-                    secret->_count_ingredient[ing_pos] -= 1;
+                _count_bad_ingredient[pos_ing] += 1;
 
-                    _nb_bad_ingredient += 1;
-
-                    index_secrete = 0;
-
-                    break;
-                }
+                _nb_bad_ingredient += 1;
             }
-            index_secrete += 1;
-        }
+            if(index_ing_secret == index_ing_player)
+            {
+                //On le supprime de la liste secret
+                temp_secret->_ingredient.replace(index_ing_player, nullptr);
 
-        index_secrete = 0;
-        index_player += 1;
+                _count_good_ingredient[pos_ing] += 1;
+
+                _nb_good_ingredient += 1;
+            }
+        }
+        index_ing_player += 1;
     }
 }
 
@@ -170,14 +178,16 @@ double Combination::evaluate(Combination *best_individu)
     {
         if(_count_good_ingredient[index_ing] > 0)
         {
-            fitness += _ingredient.at(index_ing)->getValue()*2;
+            fitness += _ingredient.at(index_ing)->getValue();
         }
 
         if(_count_bad_ingredient[index_ing] > 0)
         {
-            fitness += _ingredient.at(index_ing)->getValue()*1;
+            fitness += (_ingredient.at(index_ing)->getValue()/2);
         }
     }
+
+//    _fitness = fitness;
 
     return fitness;
 }
@@ -185,4 +195,29 @@ double Combination::evaluate(Combination *best_individu)
 bool Combination::lessFitnessThan(const Combination *comb1, const Combination *comb2)
 {
     return comb1->fitness() > comb2->fitness();
+}
+
+void Combination::clearAllTabs()
+{
+    clearTab(_count_good_ingredient);
+    clearTab(_count_bad_ingredient);
+}
+
+void Combination::resetValues()
+{
+    clearAllTabs();
+    _nb_good_ingredient = 0;
+    _nb_bad_ingredient = 0;
+    _fitness = 0;
+}
+
+void Combination::clearTab(int *tab)
+{
+    for(int index_tab = 0; index_tab < 8; index_tab++)
+    {
+        if(tab[index_tab])
+        {
+            tab[index_tab] = int(0);
+        }
+    }
 }

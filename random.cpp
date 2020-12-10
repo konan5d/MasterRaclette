@@ -10,7 +10,8 @@ Random::Random(int seed)
 
 int Random::get(int max)
 {
-    return qrand()%max;
+    int value = qrand()%max;
+    return value;
 }
 
 double Random::getFloat()

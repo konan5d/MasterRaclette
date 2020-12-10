@@ -18,8 +18,11 @@ public:
 
     //Paramètres Génétique
     static int nb_individu;
-    static int best_fitness;
+    static double best_fitness;
     static int max_generation;
+        //Selection : (tournoi)
+    static int tournament_size;
+    static bool elitisme;
 
     static int debug;
     //static void print(QString txt, int d);

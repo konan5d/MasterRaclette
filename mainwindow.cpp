@@ -1,3 +1,7 @@
+//TODO : Affichage du mode génétique
+//TODO : Défilement automatique
+//TODO : Paramètrage des valeurs
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 

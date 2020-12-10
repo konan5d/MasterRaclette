@@ -29,6 +29,13 @@ public:
 
     void run(void);
 
+    //Selection
+    QList <Combination *> selection(QList<Combination *> *population);
+    Combination *tournament(Combination *indiv1, Combination *indiv2);
+    QList <Combination *> crossover(QList<Combination *> *population, float crossover_rate);
+
+
+
 signals:
 
 };

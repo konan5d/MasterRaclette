@@ -1,3 +1,5 @@
+//TODO : défilement automatique
+
 #include "masterraclette.h"
 
 Combination *MasterRaclette::player_combination() const
@@ -66,9 +68,10 @@ void MasterRaclette::playModePlayerVsIa() //Mode 0
             //On compte le nombre d'ingrédients présents dans la liste du joueur
             _secret_combination->countIngredient(_ingredients);
 
+            _player_combination->resetValues();
             //On compte le nombre d'ingrédients bien et mal placés
             _player_combination->compareGoodPlaceinCombi(_secret_combination);
-            _player_combination->compareBadPlaceinCombi(_secret_combination);
+//            _player_combination->compareBadPlaceinCombi(_secret_combination);
 
             //On informe le joueur
             inputUser(_player_combination->nb_good_ingredient(), _player_combination->nb_bad_ingredient());
@@ -85,18 +88,23 @@ void MasterRaclette::playModePlayerVsIa() //Mode 0
 
 void MasterRaclette::playModeIaVsPlayer() //Mode  : Génétique
 {
-    if(Parameters::game_in_progress == false)
-    {
-        //Instanciation d'Evolutionnary Process
+//    if(Parameters::game_in_progress == false)
+//    {
+//        //Instanciation d'Evolutionnary Process
+//        _evo = new EvolutionnaryProcess(_ingredients, _player_combination);
+
+//        Parameters::game_in_progress = true;
+//    }
+
+//    if(Parameters::game_in_progress == true)
+//    {
+//        _evo->run();
+//        Parameters::game_in_progress = false;
+
+//    }
+
         _evo = new EvolutionnaryProcess(_ingredients, _player_combination);
-
-        Parameters::game_in_progress = true;
-    }
-
-    if(Parameters::game_in_progress == true)
-    {
         _evo->run();
-    }
 }
 
 /* ############################ SLOTS #######################################*/
