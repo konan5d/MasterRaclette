@@ -44,6 +44,9 @@ void EvolutionnaryProcess::initFirstPopulation()
 
     double fitness = 0;
 
+
+
+
     for(int index_pop = 0; index_pop < Parameters::nb_individu; index_pop++)
     {
         indiv = new Combination(_list_ingredient);
@@ -53,6 +56,7 @@ void EvolutionnaryProcess::initFirstPopulation()
         indiv->setFitness(fitness);
 
         _population.append(indiv);
+
     }
 }
 
@@ -79,7 +83,18 @@ void EvolutionnaryProcess::run()
 
     last_population = _population;
 
+    refreshGenetiqueInformation("---------------------------------- Generation 0 (Initialisation) ----------------------------------\n");
 
+    //    if(Parameters::display_population)
+    //    {
+    //        for(int index_pop = 0; index_pop < Parameters::nb_individu; index_pop++)
+    //        {
+    //            refreshGenetiqueInformation("Individu " + QString::number(index_pop) + " : "+ last_population.at(index_pop)->toString());
+    //            refreshGenetiqueInformation(" ; Fitness = " + QString::number(last_population.at(index_pop)->fitness()) + "\n");
+    //        }
+    //    }
+
+    displayPopulation(last_population);
 
     //On cherche le meilleur individu dans les différentes générations
     //Tant qu'on a pas atteint le nombre de génération
@@ -91,6 +106,12 @@ void EvolutionnaryProcess::run()
         if(Parameters::elitisme == true)
         {
             new_population.append(bestIndividu);
+
+            if(Parameters::display_population)
+            {
+                refreshGenetiqueInformation("Best individu : " + bestIndividu->toString() + "\n");
+            }
+
         }
 
         //Selection : tournoi
@@ -103,7 +124,9 @@ void EvolutionnaryProcess::run()
         //Mutation
 
 
-        for(int nb_indiv=0; nb_indiv < 20; nb_indiv++)
+        int size_pop = new_population.size();
+
+        for(int nb_indiv=0; nb_indiv < Parameters::nb_individu - size_pop; nb_indiv++)
         {
             new_population.append(new Combination(_list_ingredient));
         }
@@ -126,7 +149,7 @@ void EvolutionnaryProcess::run()
 
         bestFitness = bestIndividu->fitness();
 
-        refreshGenetiqueInformation("Best individu : " + bestIndividu->toString() + "\n");
+        refreshGenetiqueInformation("\nBest individu : " + bestIndividu->toString() + "\n");
         refreshGenetiqueInformation("Fitness = " + QString::number(bestFitness) + "\n\n");
 
         last_population = new_population;
@@ -168,6 +191,11 @@ QList<Combination *> EvolutionnaryProcess::selection(QList <Combination *> *popu
     Combination *individu1;
     Combination *individu2;
 
+    if(Parameters::display_selection)
+    {
+        refreshGenetiqueInformation("------ Selection ------\n");
+    }
+
     for(int nb_turn = 0; nb_turn < Parameters::tournament_size; nb_turn++)
     {
         individu1 = population->takeAt(Parameters::random_nbr->get(population->size()));
@@ -175,7 +203,16 @@ QList<Combination *> EvolutionnaryProcess::selection(QList <Combination *> *popu
 
         bestIndividu = tournament(individu1, individu2);
 
+        if(Parameters::display_selection)
+        {
+            refreshGenetiqueInformation(" -- Tournament number " + QString::number(nb_turn) + "\n");
+            refreshGenetiqueInformation("   Individu 1 : " + individu1->toString() + "; Fitness = " +  QString::number(individu1->fitness()) + "\n");
+            refreshGenetiqueInformation("   Individu 2 : " + individu2->toString() + "; Fitness = " + QString::number(individu2->fitness()) + "\n");
+            refreshGenetiqueInformation("   => Winner : " + bestIndividu->toString() + "; Fitness = " + QString::number(bestIndividu->fitness()) + "\n");
+        }
+
         selected_individu.append(bestIndividu);
+
     }
 
     return selected_individu;
@@ -202,7 +239,7 @@ QList<Combination *> EvolutionnaryProcess::crossover(QList <Combination *> *popu
 
     //TODO : setter pour le genome
 
-    int nb_indiv = 5;
+    int nb_indiv = 20;
 
     QList <Combination *> temp_pop;
 
@@ -240,5 +277,19 @@ QList<Combination *> EvolutionnaryProcess::crossover(QList <Combination *> *popu
 
     return temp_pop;
 
+}
+
+void EvolutionnaryProcess::displayPopulation(QList<Combination *> population)
+{
+    if(Parameters::display_population)
+    {
+        for(int index_pop = 0; index_pop < Parameters::nb_individu; index_pop++)
+        {
+            refreshGenetiqueInformation("Individu " + QString::number(index_pop) + " : "+ population.at(index_pop)->toString() + "\n");
+            refreshGenetiqueInformation("   Fitness = " + QString::number(population.at(index_pop)->fitness()) + "\n");
+            refreshGenetiqueInformation("   Number of good ingredient : " + QString::number(population.at(index_pop)->nb_good_ingredient()) + "\n");
+            refreshGenetiqueInformation("   Number of bad ingredient : " + QString::number(population.at(index_pop)->nb_bad_ingredient()) + "\n");
+        }
+    }
 }
 

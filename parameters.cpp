@@ -20,6 +20,11 @@ bool Parameters::elitisme = false;
     //Crossover Rate
 double Parameters::crossover_rate = 0.5;
 
+//Display Info
+bool Parameters::display_population = true;
+bool Parameters::display_selection = true;
+bool Parameters::display_crossover = true;
+
 int Parameters::nb_generation = 0;
 
 Random *Parameters::random_nbr= new Random(-1);

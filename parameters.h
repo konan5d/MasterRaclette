@@ -27,11 +27,19 @@ public:
     static double crossover_rate;
 
     static int nb_generation;
+        //Display Info
+    static bool display_population;
+    static bool display_selection;
+    static bool display_crossover;
+
+
 
     static int debug;
     //static void print(QString txt, int d);
 
     static Random *random_nbr;
+
+
 };
 
 #endif // PARAMETERS_H
