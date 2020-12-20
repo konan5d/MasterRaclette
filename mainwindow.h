@@ -71,6 +71,7 @@ private:
     QLineEdit *_line_nb_gen;
     QLineEdit *_line_tournament_size;
     QLineEdit *_line_crossover_rate;
+    QLineEdit *_line_mutation_rate;
     QLineEdit *_line_nb_indiv;
     QLineEdit *_line_best_fitness;
 
@@ -129,6 +130,7 @@ public slots:
     void setNumberOfIndividu(QString value);
     void setTournamentSize(QString value);
     void setCrosssoverRate(QString value);
+    void setMutationRate(QString value);
 
 
 private:

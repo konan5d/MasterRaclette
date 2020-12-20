@@ -47,6 +47,7 @@ public:
     Combination *tournament(Combination *indiv1, Combination *indiv2);
     QList <Combination *> crossover(QList<Combination *> *population, float crossover_rate);
 
+
     void displayPopulation(QList <Combination *> population);
 
 

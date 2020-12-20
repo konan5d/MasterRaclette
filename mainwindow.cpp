@@ -280,6 +280,10 @@ QGroupBox *MainWindow::IaVsPlayerInfo(QGroupBox *group_box)
     _line_crossover_rate = new QLineEdit();
     _line_crossover_rate->setText(QString::number(Parameters::crossover_rate));
 
+    QLabel *label_mutation_rate = new QLabel("(Mutation) Rate (0 -> 1) :");
+    _line_mutation_rate = new QLineEdit();
+    _line_mutation_rate->setText(QString::number(Parameters::mutation_rate));
+
     QLabel *label_nb_gen = new QLabel("(Result) Generation Number :");
     _line_nb_gen = new QLineEdit();
     _line_nb_gen->setReadOnly(true);
@@ -302,11 +306,14 @@ QGroupBox *MainWindow::IaVsPlayerInfo(QGroupBox *group_box)
     grid->addWidget(label_crossover_rate, 3, 0);
     grid->addWidget(_line_crossover_rate, 3, 1);
 
-    grid->addWidget(label_nb_gen, 4, 0);
-    grid->addWidget(_line_nb_gen, 4, 1);
+    grid->addWidget(label_mutation_rate, 4, 0);
+    grid->addWidget(_line_mutation_rate, 4, 1);
 
-    grid->addWidget(label_best_fitness, 5, 0);
-    grid->addWidget(_line_best_fitness, 5, 1);
+    grid->addWidget(label_nb_gen, 5, 0);
+    grid->addWidget(_line_nb_gen, 5, 1);
+
+    grid->addWidget(label_best_fitness, 6, 0);
+    grid->addWidget(_line_best_fitness, 6, 1);
 
     group_box->setLayout(grid);
 
@@ -314,7 +321,7 @@ QGroupBox *MainWindow::IaVsPlayerInfo(QGroupBox *group_box)
     connect(_line_nb_indiv, &QLineEdit::editingFinished, this, [this](){setNumberOfIndividu(_line_nb_indiv->text());});
     connect(_line_tournament_size, &QLineEdit::editingFinished, this, [this](){setTournamentSize(_line_tournament_size->text());});
     connect(_line_crossover_rate, &QLineEdit::editingFinished, this, [this](){setCrosssoverRate(_line_crossover_rate->text());});
-
+    connect(_line_mutation_rate, &QLineEdit::editingFinished, this, [this](){setMutationRate(_line_mutation_rate->text());});
 
     return group_box;
 }
@@ -562,9 +569,22 @@ void MainWindow::setCrosssoverRate(QString value)
 
     double temp_value = value.toDouble(&str_to_double);
 
-    //Verify Int conversion
+    //Verify Double conversion
     if(str_to_double)
     {
         Parameters::crossover_rate = temp_value;
+    }
+}
+
+void MainWindow::setMutationRate(QString value)
+{
+    bool str_to_double = false;
+
+    double temp_value = value.toDouble(&str_to_double);
+
+    //Verify Double conversion
+    if(str_to_double)
+    {
+        Parameters::mutation_rate = temp_value;
     }
 }

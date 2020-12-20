@@ -25,6 +25,8 @@ bool Parameters::display_population = true;
 bool Parameters::display_selection = true;
 bool Parameters::display_crossover = true;
 
+double Parameters::mutation_rate = 0.1;
+
 int Parameters::nb_generation = 0;
 
 Random *Parameters::random_nbr= new Random(-1);

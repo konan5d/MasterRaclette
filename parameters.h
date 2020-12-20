@@ -32,6 +32,8 @@ public:
     static bool display_selection;
     static bool display_crossover;
 
+    static double mutation_rate;
+
 
 
     static int debug;

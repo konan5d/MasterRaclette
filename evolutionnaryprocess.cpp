@@ -44,9 +44,6 @@ void EvolutionnaryProcess::initFirstPopulation()
 
     double fitness = 0;
 
-
-
-
     for(int index_pop = 0; index_pop < Parameters::nb_individu; index_pop++)
     {
         indiv = new Combination(_list_ingredient);
@@ -85,15 +82,6 @@ void EvolutionnaryProcess::run()
 
     refreshGenetiqueInformation("---------------------------------- Generation 0 (Initialisation) ----------------------------------\n");
 
-    //    if(Parameters::display_population)
-    //    {
-    //        for(int index_pop = 0; index_pop < Parameters::nb_individu; index_pop++)
-    //        {
-    //            refreshGenetiqueInformation("Individu " + QString::number(index_pop) + " : "+ last_population.at(index_pop)->toString());
-    //            refreshGenetiqueInformation(" ; Fitness = " + QString::number(last_population.at(index_pop)->fitness()) + "\n");
-    //        }
-    //    }
-
     displayPopulation(last_population);
 
     //On cherche le meilleur individu dans les différentes générations
@@ -118,11 +106,10 @@ void EvolutionnaryProcess::run()
         new_population = selection(&last_population);
         //new_population = new_population + this->selection(last_population);
 
-        //Croisement
+
+        refreshGenetiqueInformation("\n-- Crossover \n");
+        //Croisement + Mutation
         new_population = new_population + this->crossover(&last_population, Parameters::crossover_rate);
-
-        //Mutation
-
 
         int size_pop = new_population.size();
 
@@ -166,23 +153,6 @@ void EvolutionnaryProcess::run()
 
     //Affichage des infos : gen + fitness
 }
-
-//void EvolutionnaryProcess::run_2()
-//{
-//    if(_init_evo_process == false)
-//    {
-//        //On tri la population intiale
-//        std::sort(_population.begin(), _population.end(), Combination::lessFitnessThan);
-
-//        //On récupère l'individu avec le  meilleur fitness
-//        _bestIndividu = _population.first();
-
-//        //Vérification si on trouve l'individu dans la 1ère pop
-//        _bestFitness = _bestIndividu->fitness();
-
-//        _last_population = _population;
-//    }
-//}
 
 QList<Combination *> EvolutionnaryProcess::selection(QList <Combination *> *population)
 {
@@ -270,6 +240,35 @@ QList<Combination *> EvolutionnaryProcess::crossover(QList <Combination *> *popu
 
         indiv_1->resetValues();
         indiv_2->resetValues();
+
+        if(Parameters::random_nbr->getFloat() <= Parameters::mutation_rate)
+        {
+
+            int rand_indiv = Parameters::random_nbr->get(1);
+
+            if(rand_indiv == 0)
+            {
+                int rand_nb_ing = Parameters::random_nbr->get(Parameters::nb_ingredient_available);
+
+                Ingredient *random_gen = _list_ingredient.at(rand_nb_ing);
+
+                indiv_1->setGenome(random_gen, Parameters::random_nbr->get(Parameters::nb_ingredient));
+
+                refreshGenetiqueInformation("-- Mutation ! : " + indiv_1->toString() + "\n");
+
+            }
+            else if(rand_indiv == 1)
+            {
+                int rand_nb_ing = Parameters::random_nbr->get(Parameters::nb_ingredient_available);
+
+                Ingredient *random_gen = _list_ingredient.at(rand_nb_ing);
+
+                indiv_1->setGenome(random_gen, Parameters::random_nbr->get(Parameters::nb_ingredient));
+
+                refreshGenetiqueInformation("-- Mutation ! : " + indiv_2->toString() + "\n");
+            }
+
+        }
 
         temp_pop.append(indiv_1);
         temp_pop.append(indiv_2);
