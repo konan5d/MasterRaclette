@@ -17,6 +17,11 @@ int Parameters::max_generation = 200;
 int Parameters::tournament_size = 20;
 bool Parameters::elitisme = false;
 
+    //Crossover Rate
+double Parameters::crossover_rate = 0.5;
+
+int Parameters::nb_generation = 0;
+
 Random *Parameters::random_nbr= new Random(-1);
 
 Parameters::Parameters()

@@ -6,6 +6,7 @@
 #include "parameters.h"
 #include "combination.h"
 #include "evolutionnaryprocess.h"
+#include <QTextEdit>
 
 class MasterRaclette : public QWidget
 {
@@ -25,6 +26,9 @@ private:
     bool _game_finish = true;
     int _nb_try = 0;
 
+    //Display
+    QTextEdit *_display;
+
 public:
     MasterRaclette(QWidget *parent = 0);
     QList<Ingredient *> ingredients() const;
@@ -37,17 +41,23 @@ public:
 
     int nb_try() const;
 
+    EvolutionnaryProcess *evo() const;
+
 signals:
     //Mode : Player Vs IA
     void inputUser(int nb_good, int nb_bad);
     void setNbTry(int nb_try);
     void gameFinished(bool state);
 
+    void refreshGenetiqueInfoOnDisplay(QString data);
+
 public slots:
     void setGameMode(int mode);
     void setNumberIngredient(int nb_ingredient);
     void setPlayerCombination(QList <int> list_ind_ingredient);
     void resetGame(void);
+
+    void setGenetiqueInfo(QString data);
 
 };
 

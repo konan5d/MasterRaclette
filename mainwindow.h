@@ -23,6 +23,7 @@
 //MasterRaclette Widget
 #include "ingredientbox.h"
 
+#include "evolutionnaryprocess.h"
 #include "masterraclette.h"
 
 QT_BEGIN_NAMESPACE
@@ -61,13 +62,18 @@ private:
 
     //Game Info
     QGroupBox *_grbox_game_info;
-        /* Player Vs IA */
+    /* Player Vs IA */
     QLineEdit *_line_nb_try;
     QLineEdit *_line_nb_try_player;
 
-        /* IA vs Player */
+    /* IA vs Player */
+    QLineEdit *_line_max_gen;
     QLineEdit *_line_nb_gen;
-    QLineEdit *_line_nb_gen2;
+    QLineEdit *_line_tournament_size;
+    QLineEdit *_line_crossover_rate;
+    QLineEdit *_line_nb_indiv;
+    QLineEdit *_line_best_fitness;
+
 
     //Button Group : Quit & Change Game mode
     QHBoxLayout *_hbox_ui_button;
@@ -93,6 +99,8 @@ public:
     //Button Group : Quit & Change Game mode
     QHBoxLayout *createUIButtonGroup(void);
 
+    void displayInfo(QString data);
+
     ~MainWindow();
 
 public slots:
@@ -109,10 +117,19 @@ public slots:
     void enablePlayButton(int mode);
     void enableChangeModeButton(int mode);
 
-    // IN GAME 
-        //Mode : Player Vs IA
+    // IN GAME
+    //Mode : Player Vs IA
     void displayResult(int nb_good_ing, int nb_bad_ing);
     void refreshGameInfo(int mode, int value);
+
+    //Mode : IA vs Player
+    void refreshGenetiqueDisplay(QString data); //TEST
+
+    void setMaxGenerationNumber(QString value);
+    void setNumberOfIndividu(QString value);
+    void setTournamentSize(QString value);
+    void setCrosssoverRate(QString value);
+
 
 private:
     Ui::MainWindow *ui;

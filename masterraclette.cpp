@@ -12,6 +12,11 @@ int MasterRaclette::nb_try() const
     return _nb_try;
 }
 
+EvolutionnaryProcess *MasterRaclette::evo() const
+{
+    return _evo;
+}
+
 MasterRaclette::MasterRaclette(QWidget *parent)
     : QWidget(parent)
 {
@@ -25,8 +30,6 @@ MasterRaclette::MasterRaclette(QWidget *parent)
     _ingredients.append(new Ingredient("Bacon", 8));
 
     Parameters::nb_ingredient_available = _ingredients.size();
-
-
 }
 
 QList<Ingredient *> MasterRaclette::ingredients() const
@@ -88,22 +91,10 @@ void MasterRaclette::playModePlayerVsIa() //Mode 0
 
 void MasterRaclette::playModeIaVsPlayer() //Mode  : Génétique
 {
-//    if(Parameters::game_in_progress == false)
-//    {
-//        //Instanciation d'Evolutionnary Process
-//        _evo = new EvolutionnaryProcess(_ingredients, _player_combination);
-
-//        Parameters::game_in_progress = true;
-//    }
-
-//    if(Parameters::game_in_progress == true)
-//    {
-//        _evo->run();
-//        Parameters::game_in_progress = false;
-
-//    }
-
         _evo = new EvolutionnaryProcess(_ingredients, _player_combination);
+
+        connect(_evo, &EvolutionnaryProcess::refreshGenetiqueInformation, [this](QString data){setGenetiqueInfo(data);});
+
         _evo->run();
 }
 
@@ -137,5 +128,10 @@ void MasterRaclette::setPlayerCombination(QList <int> list_ind_ingredient)
 void MasterRaclette::resetGame()
 {
     Parameters::game_in_progress = false;
+}
+
+void MasterRaclette::setGenetiqueInfo(QString data)
+{
+    refreshGenetiqueInfoOnDisplay(data);
 }
 

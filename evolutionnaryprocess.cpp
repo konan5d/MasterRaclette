@@ -10,6 +10,7 @@ EvolutionnaryProcess::EvolutionnaryProcess(QObject *parent) : QObject(parent)
 
 EvolutionnaryProcess::EvolutionnaryProcess(QList <Ingredient *> list_ingredient, Combination *individu_zero)
 {
+
     //On sauvegarde la liste d'ingrédients
     _list_ingredient = list_ingredient;
 
@@ -57,9 +58,11 @@ void EvolutionnaryProcess::initFirstPopulation()
 
 void EvolutionnaryProcess::run()
 {
+    int temp_generation = 0;
     //Initialisation
     QList <Combination *> new_population;
     QList <Combination *> last_population;
+    //Combination == class Individu
     Combination *bestIndividu;
 
     double bestFitness = 0;
@@ -76,11 +79,14 @@ void EvolutionnaryProcess::run()
 
     last_population = _population;
 
+
+
     //On cherche le meilleur individu dans les différentes générations
     //Tant qu'on a pas atteint le nombre de génération
     //Ou tant qu'on a pas atteint le fitness de l'individu zéro (entré par l'utilisateur)
-    while(nb_generation < Parameters::max_generation && bestFitness < _individu_zero->fitness())
+    while(nb_generation <= Parameters::max_generation && bestFitness < _individu_zero->fitness())
     {
+        refreshGenetiqueInformation("---------------------------------- Generation " + QString::number(nb_generation, 10) + " ----------------------------------\n");
 
         if(Parameters::elitisme == true)
         {
@@ -92,7 +98,7 @@ void EvolutionnaryProcess::run()
         //new_population = new_population + this->selection(last_population);
 
         //Croisement
-        new_population = new_population + this->crossover(&last_population, 0.5);
+        new_population = new_population + this->crossover(&last_population, Parameters::crossover_rate);
 
         //Mutation
 
@@ -120,12 +126,40 @@ void EvolutionnaryProcess::run()
 
         bestFitness = bestIndividu->fitness();
 
+        refreshGenetiqueInformation("Best individu : " + bestIndividu->toString() + "\n");
+        refreshGenetiqueInformation("Fitness = " + QString::number(bestFitness) + "\n\n");
+
         last_population = new_population;
         // --> Nouvelle génération
 
         nb_generation += 1;
     }
+
+    Parameters::nb_generation = nb_generation;
+    Parameters::best_fitness = bestFitness;
+
+    refreshGenetiqueInformation("---------------------------------- Process Completed  ----------------------------------\n");
+
+
+    //Affichage des infos : gen + fitness
 }
+
+//void EvolutionnaryProcess::run_2()
+//{
+//    if(_init_evo_process == false)
+//    {
+//        //On tri la population intiale
+//        std::sort(_population.begin(), _population.end(), Combination::lessFitnessThan);
+
+//        //On récupère l'individu avec le  meilleur fitness
+//        _bestIndividu = _population.first();
+
+//        //Vérification si on trouve l'individu dans la 1ère pop
+//        _bestFitness = _bestIndividu->fitness();
+
+//        _last_population = _population;
+//    }
+//}
 
 QList<Combination *> EvolutionnaryProcess::selection(QList <Combination *> *population)
 {

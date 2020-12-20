@@ -38,6 +38,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Connect
     connect(_masterraclette, &MasterRaclette::inputUser, [this](int nb_good, int nb_bad){displayResult(nb_good, nb_bad);});
+    //connect(_masterraclette->evo(), &EvolutionnaryProcess::refreshInformation, [this](QString data){refreshGenetiqueDisplay(data);});
+    connect(_masterraclette, &MasterRaclette::refreshGenetiqueInfoOnDisplay, [this](QString data){refreshGenetiqueDisplay(data);});
+
     //connect(_masterraclette, &MasterRaclette::gameFinished, [this](bool state){displayResult(state);});
 
     setCentralWidget(_widget_ui);
@@ -261,21 +264,56 @@ QGroupBox *MainWindow::IaVsPlayerInfo(QGroupBox *group_box)
 {
     QGridLayout *grid = new QGridLayout();
 
-    QLabel *label_nb_gen = new QLabel("Generation Number :");
+    QLabel *label_max_gen = new QLabel("(Parameters) Max Generation Number :");
+    _line_max_gen = new QLineEdit();
+    _line_max_gen->setText(QString::number(Parameters::max_generation));
+
+    QLabel *label_nb_indiv = new QLabel("(Parameters) Number of Individu :");
+    _line_nb_indiv = new QLineEdit();
+    _line_nb_indiv->setText(QString::number(Parameters::nb_individu));
+
+    QLabel *label_tournament_size = new QLabel("(Selection) Tournament Size :");
+    _line_tournament_size = new QLineEdit();
+    _line_tournament_size->setText(QString::number(Parameters::tournament_size));
+
+    QLabel *label_crossover_rate = new QLabel("(Crossover) Rate (0 -> 1) :");
+    _line_crossover_rate = new QLineEdit();
+    _line_crossover_rate->setText(QString::number(Parameters::crossover_rate));
+
+    QLabel *label_nb_gen = new QLabel("(Result) Generation Number :");
     _line_nb_gen = new QLineEdit();
     _line_nb_gen->setReadOnly(true);
+    _line_nb_gen->setText("0");
 
-    QLabel *label_nb_gen2 = new QLabel("Generation Number 2:");
-    _line_nb_gen2 = new QLineEdit();
-    _line_nb_gen2->setReadOnly(true);
+    QLabel *label_best_fitness = new QLabel("(Result) Best Fitness :");
+    _line_best_fitness = new QLineEdit();
+    _line_best_fitness->setReadOnly(true);
+    _line_best_fitness->setText("0");
 
-    grid->addWidget(label_nb_gen, 0, 0);
-    grid->addWidget(_line_nb_gen, 0, 1);
+    grid->addWidget(label_max_gen, 0, 0);
+    grid->addWidget(_line_max_gen, 0, 1);
 
-    grid->addWidget(label_nb_gen2, 1, 0);
-    grid->addWidget(_line_nb_gen2, 1, 1);
+    grid->addWidget(label_nb_indiv, 1, 0);
+    grid->addWidget(_line_nb_indiv, 1, 1);
+
+    grid->addWidget(label_tournament_size, 2, 0);
+    grid->addWidget(_line_tournament_size, 2, 1);
+
+    grid->addWidget(label_crossover_rate, 3, 0);
+    grid->addWidget(_line_crossover_rate, 3, 1);
+
+    grid->addWidget(label_nb_gen, 4, 0);
+    grid->addWidget(_line_nb_gen, 4, 1);
+
+    grid->addWidget(label_best_fitness, 5, 0);
+    grid->addWidget(_line_best_fitness, 5, 1);
 
     group_box->setLayout(grid);
+
+    connect(_line_max_gen, &QLineEdit::editingFinished, this, [this](){setMaxGenerationNumber(_line_max_gen->text());});
+    connect(_line_nb_indiv, &QLineEdit::editingFinished, this, [this](){setNumberOfIndividu(_line_nb_indiv->text());});
+    connect(_line_tournament_size, &QLineEdit::editingFinished, this, [this](){setTournamentSize(_line_tournament_size->text());});
+    connect(_line_crossover_rate, &QLineEdit::editingFinished, this, [this](){setCrosssoverRate(_line_crossover_rate->text());});
 
 
     return group_box;
@@ -314,6 +352,11 @@ QHBoxLayout *MainWindow::createUIButtonGroup()
 
 
     return hbox_layout;
+}
+
+void MainWindow::displayInfo(QString data)
+{
+    _textedit_display->setPlainText(data);
 }
 
 MainWindow::~MainWindow()
@@ -378,6 +421,8 @@ void MainWindow::inputCombination()
     {
         //Si le joueur a rentré suffisement d'ingrédients pour jouer
         _masterraclette->setPlayerCombination(list_ind_ingredient);
+
+        _textedit_display->clear();
 
         _masterraclette->launchGame();
 
@@ -461,5 +506,65 @@ void MainWindow::refreshGameInfo(int mode, int value)
     else if (mode == 1)
     {
         //Nothing to do
+    }
+}
+
+void MainWindow::refreshGenetiqueDisplay(QString data)
+{
+    _textedit_display->insertPlainText(data);
+
+    _line_best_fitness->setText(QString::number(Parameters::best_fitness));
+    _line_nb_gen->setText(QString::number(Parameters::nb_generation));
+}
+
+void MainWindow::setMaxGenerationNumber(QString value)
+{
+    bool str_to_int = false;
+
+    int temp_value = value.toInt(&str_to_int, 10);
+
+    //Verify Int conversion
+    if(str_to_int)
+    {
+        Parameters::max_generation = temp_value;
+    }
+}
+
+void MainWindow::setNumberOfIndividu(QString value)
+{
+    bool str_to_int = false;
+
+    int temp_value = value.toInt(&str_to_int, 10);
+
+    //Verify Int conversion
+    if(str_to_int)
+    {
+        Parameters::nb_individu = temp_value;
+    }
+}
+
+void MainWindow::setTournamentSize(QString value)
+{
+    bool str_to_int = false;
+
+    int temp_value = value.toInt(&str_to_int, 10);
+
+    //Verify Int conversion
+    if(str_to_int)
+    {
+        Parameters::tournament_size = temp_value;
+    }
+}
+
+void MainWindow::setCrosssoverRate(QString value)
+{
+    bool str_to_double = false;
+
+    double temp_value = value.toDouble(&str_to_double);
+
+    //Verify Int conversion
+    if(str_to_double)
+    {
+        Parameters::crossover_rate = temp_value;
     }
 }

@@ -23,6 +23,10 @@ public:
         //Selection : (tournoi)
     static int tournament_size;
     static bool elitisme;
+        //Crossover
+    static double crossover_rate;
+
+    static int nb_generation;
 
     static int debug;
     //static void print(QString txt, int d);
